@@ -7,7 +7,7 @@ c.TOTAL = 4
 OUT = c.ROOT / "out" / "tank"
 OUT.mkdir(parents=True, exist_ok=True)
 A = c.ROOT / "assets"
-SRC = "공식 공지 · 2026.11"
+SRC = "인게임 기준 · 2026.11"
 U = str(A / "info_cards") + "/"
 
 
@@ -16,14 +16,24 @@ def tank(w):
     return t.resize((w, int(t.height * w / t.width)), Image.LANCZOS)
 
 
+SHOP = c.ROOT / "assets" / "tank_shop"
+
+
+def coin(h):
+    im = Image.open(SHOP / "coin.png").convert("RGBA")
+    return im.resize((int(im.width * h / im.height), h), Image.LANCZOS)
+
+
 def cover():
     img = Image.new("RGBA", (W, H), PAPER + (255,))
-    t = tank(1000)
-    img.alpha_composite(t, (W - t.width - 20, H - 96 - t.height - 20))
+    kv = Image.open(c.ROOT / "assets" / "tank_map.png").convert("RGBA")
+    kv = kv.crop((0, 0, int(kv.width * 0.80), kv.height))  # 오른쪽 위 게임 안내 문구 제외
+    kv = fade(kv.resize((W, int(kv.height * W / kv.width)), Image.LANCZOS), bottom=240)
+    img.alpha_composite(kv, (0, 0))
+    t = tank(600)
+    img.alpha_composite(t, (W - t.width - 20, 330))
     d = ImageDraw.Draw(img)
-    y = 150
-    tracked(d, (M, y), "1.5 신규 콘텐츠", F("Bold", 28), SOFT, track=0.04)
-    y += 60
+    y = 790
     tracked(d, (M - 6, y), "탄탄대로", F("Black", 150), INK, track=-0.05)
     y += 196
     d.text((M, y), "4인 탱크 대전", font=F("Bold", 40), fill=ACCENT)
@@ -34,10 +44,9 @@ def cover():
 
 
 RULES = [
-    ("4명 개인전", "포탄을 맞히면 점수"),
-    ("시간이 끝나면", "최종 점수대로 보상"),
-    ("공중 보급", "강한 포탄을 얻는다"),
-    ("중앙 쟁탈 구역", "보급품을 먹으면 상대 위치가 보이고\n여기서 격파하면 점수를 더 받는다"),
+    ("4명 개인전", "포탄을 맞히면 점수 · 끝나면 점수대로 보상"),
+    ("공중 보급", "강한 포탄"),
+    ("중앙 쟁탈 구역", "상대 위치가 보이고, 여기서 격파하면 점수 더"),
 ]
 
 
@@ -49,40 +58,72 @@ def rules():
     y += 160
     d.line([M, y, W - M, y], fill=INK, width=3)
     for i, (head, body) in enumerate(RULES):
-        rh = 170 if "\n" in body else 140
-        d.text((M - 2, y + 26), f"{i + 1}", font=N("Black", 64), fill=VIVID)
+        d.text((M - 2, y + 30), f"{i + 1}", font=N("Black", 64), fill=VIVID)
         tx = M + 90
-        d.text((tx, y + 28), head, font=F("Black", 40), fill=INK)
-        d.multiline_text((tx, y + 84), body, font=F("Medium", 28), fill=ACCENT, spacing=10)
-        y += rh
+        d.text((tx, y + 30), head, font=F("Black", 44), fill=INK)
+        d.text((tx, y + 92), body, font=F("Medium", 28), fill=ACCENT)
+        y += 160
         d.line([M, y, W - M, y], fill=LINE, width=2)
-    t = tank(420)
-    img.alpha_composite(t, (W - t.width - 30, H - 84 - t.height))
+    t = tank(520)
+    img.alpha_composite(t, (W - t.width - 20, H - 84 - t.height))
     d = ImageDraw.Draw(img)
     brand_bar(d, 2, SRC)
     img.convert("RGB").save(OUT / "02_rules.png", optimize=True)
+
+
+ITEMS = [  # (아이콘, 이름, 총량, 코인 합계)
+    ("stone", "환석", "300", 450),
+    ("fons", "폰즈", "150,000", 300),
+    ("ticket", "유빙 극장 티켓", "2", 200),
+    ("guide", "특급 헌터 가이드", "12", 240),
+    ("dye", "혼돈 염료", "12", 240),
+    ("core", "확장 코어", "30", 225),
+    ("unit", "이성질 유닛", "45", 225),
+    ("beetle", "비틀 코인", "60,000", 120),
+]
 
 
 def rewards():
     img = Image.new("RGBA", (W, H), PAPER + (255,))
     d = ImageDraw.Draw(img)
     y = 150 + 52
-    tracked(d, (M - 4, y), "보상", F("Black", 96), INK, track=-0.04)
+    tracked(d, (M - 4, y), "기념 상점", F("Black", 96), INK, track=-0.04)
     y += 150
-    d.text((M, y), "참여하면 이벤트 코인 → 이벤트 상점에서 교환", font=F("Medium", 28), fill=SOFT)
-    y += 70
-    d.line([M, y, W - M, y], fill=INK, width=3)
-    st = Image.open(A / "icons" / "stone.png").convert("RGBA")
-    sh = 150
-    st = st.resize((int(st.width * sh / st.height), sh), Image.LANCZOS)
-    img.alpha_composite(st, (M - 6, y + 34))
-    d.text((M + st.width + 24, y + 62), "환석", font=F("Black", 72), fill=INK)
-    y += 220
-    d.line([M, y, W - M, y], fill=LINE, width=2)
-    for name in ["폰즈", "영화 티켓", "특급 헌터 가이드", "혼돈 염료"]:
-        d.text((M, y + 26), name, font=F("Bold", 40), fill=INK)
-        y += 100
-        d.line([M, y, W - M, y], fill=LINE, width=2)
+    d.text((M, y), "전부 사면 받는 양 · 드는 코인", font=F("Medium", 28), fill=SOFT)
+    y += 64
+    gap = 16
+    cols = 4
+    cw = (W - 2 * M - gap * (cols - 1)) // cols
+    ch = 300
+    for i, (key, name, qty, cost) in enumerate(ITEMS):
+        r, cc = divmod(i, cols)
+        x, yy = M + cc * (cw + gap), y + r * (ch + gap)
+        d.rounded_rectangle((x, yy, x + cw - 1, yy + ch - 1), 18, fill=PANEL if key != "stone" else (226, 224, 250))
+        ic = Image.open(SHOP / f"{key}.png").convert("RGBA")
+        ic.thumbnail((cw - 70, 130), Image.LANCZOS)
+        img.alpha_composite(ic, (x + (cw - ic.width) // 2, yy + 24 + (130 - ic.height) // 2))
+        d = ImageDraw.Draw(img)
+        fq = N("Black", 44)
+        tw = d.textlength(qty, font=fq)
+        d.text((x + (cw - tw) / 2, yy + 160), qty, font=fq, fill=VIVID if key == "stone" else INK)
+        fn = F("Bold", 21)
+        nw = d.textlength(name, font=fn)
+        d.text((x + (cw - nw) / 2, yy + 214), name, font=fn, fill=ACCENT)
+        co = coin(28)
+        ct = f"{cost:,}"
+        fc = N("Bold", 26)
+        tot = co.width + 8 + d.textlength(ct, font=fc)
+        cx = x + (cw - tot) / 2
+        img.alpha_composite(co, (int(cx), yy + 252))
+        d = ImageDraw.Draw(img)
+        d.text((cx + co.width + 8, yy + 250), ct, font=fc, fill=INK)
+    y += 2 * ch + gap + 40
+    d.rectangle([M, y, W - M, y + 120], fill=INK)
+    co = coin(56)
+    img.alpha_composite(co, (M + 34, y + 32))
+    d = ImageDraw.Draw(img)
+    d.text((M + 110, y + 24), "전부 사려면 2,000", font=F("Black", 38), fill=(255, 255, 255))
+    d.text((M + 110, y + 72), "이벤트에서 얻는 코인은 최대 1,500", font=F("Medium", 24), fill=(190, 200, 230))
     brand_bar(d, 3, SRC)
     img.convert("RGB").save(OUT / "03_rewards.png", optimize=True)
 
