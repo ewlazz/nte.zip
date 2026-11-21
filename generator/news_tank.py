@@ -118,12 +118,11 @@ def rewards():
         d = ImageDraw.Draw(img)
         d.text((cx + co.width + 8, yy + 250), ct, font=fc, fill=INK)
     y += 2 * ch + gap + 40
-    d.rectangle([M, y, W - M, y + 120], fill=INK)
+    d.rectangle([M, y, W - M, y + 110], fill=INK)
     co = coin(56)
-    img.alpha_composite(co, (M + 34, y + 32))
+    img.alpha_composite(co, (M + 34, y + 27))
     d = ImageDraw.Draw(img)
-    d.text((M + 110, y + 24), "전부 사려면 2,000", font=F("Black", 38), fill=(255, 255, 255))
-    d.text((M + 110, y + 72), "이벤트에서 얻는 코인은 최대 1,500", font=F("Medium", 24), fill=(190, 200, 230))
+    d.text((M + 110, y + 30), "전부 사려면 2,000", font=F("Black", 40), fill=(255, 255, 255))
     brand_bar(d, 2, SRC)
     img.convert("RGB").save(OUT / "02_rewards.png", optimize=True)
 
