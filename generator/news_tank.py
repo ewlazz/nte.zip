@@ -30,10 +30,10 @@ def cover():
     kv = kv.crop((0, 0, int(kv.width * 0.80), kv.height))  # 오른쪽 위 게임 안내 문구 제외
     kv = fade(kv.resize((W, int(kv.height * W / kv.width)), Image.LANCZOS), bottom=240)
     img.alpha_composite(kv, (0, 0))
-    t = tank(600)
-    img.alpha_composite(t, (W - t.width - 20, 330))
+    t = tank(580)
+    img.alpha_composite(t, (W - t.width - 10, H - 90 - t.height))
     d = ImageDraw.Draw(img)
-    y = 790
+    y = 600
     tracked(d, (M - 6, y), "탄탄대로", F("Black", 150), INK, track=-0.05)
     y += 196
     d.text((M, y), "4인 탱크 대전", font=F("Bold", 40), fill=ACCENT)
