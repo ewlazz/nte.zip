@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw
 import cardnews_v2 as c
 from cardnews_v2 import F, N, W, H, M, PAPER, PANEL, INK, ACCENT, SOFT, LINE, VIVID, tracked, fade, brand_bar
 
-c.TOTAL = 4
+c.TOTAL = 3
 OUT = c.ROOT / "out" / "tank"
 OUT.mkdir(parents=True, exist_ok=True)
 A = c.ROOT / "assets"
@@ -36,7 +36,7 @@ def cover():
     y = 600
     tracked(d, (M - 6, y), "탄탄대로", F("Black", 150), INK, track=-0.05)
     y += 196
-    d.text((M, y), "4인 탱크 대전", font=F("Bold", 40), fill=ACCENT)
+    d.text((M, y), "4명 개인전 · 맞히면 점수", font=F("Bold", 40), fill=ACCENT)
     y += 76
     tracked(d, (M - 4, y), "11.11 – 12.23", N("Black", 64), VIVID, track=-0.02)
     brand_bar(d, 1, SRC)
@@ -124,8 +124,8 @@ def rewards():
     d = ImageDraw.Draw(img)
     d.text((M + 110, y + 24), "전부 사려면 2,000", font=F("Black", 38), fill=(255, 255, 255))
     d.text((M + 110, y + 72), "이벤트에서 얻는 코인은 최대 1,500", font=F("Medium", 24), fill=(190, 200, 230))
-    brand_bar(d, 3, SRC)
-    img.convert("RGB").save(OUT / "03_rewards.png", optimize=True)
+    brand_bar(d, 2, SRC)
+    img.convert("RGB").save(OUT / "02_rewards.png", optimize=True)
 
 
 ORDER = ['nanally', 'hotori', 'lacrimosa', 'chaos', 'shinku', 'iroi',
@@ -163,9 +163,9 @@ def outro():
             d.rounded_rectangle((x, yy, x + tw - 1, yy + th - 1), 18, fill=PANEL)
             f = N("Black", 96)
             d.text((x + (tw - d.textlength("?", font=f)) / 2, yy + th / 2 - 62), "?", font=f, fill=SOFT)
-    img.save(OUT / "04_outro.png", optimize=True)
+    img.save(OUT / "03_outro.png", optimize=True)
 
 
 if __name__ == "__main__":
-    cover(); rules(); rewards(); outro()
+    cover(); rewards(); outro()
     print("tank ok")
